@@ -3,6 +3,9 @@ var express = require("express");
 var app = express();
 var member = require("./member.js");
 
+
+
+
 var items=[
   { name:"우유",
     price:2000
@@ -18,7 +21,7 @@ app.use(express.static("public"));
 app.use(express.bodyParser());
 app.use(app.router);
 
-app.get("/insertMember", function(request,respone){
+app.get("/insertMember", function(request,response){
   var name = request.param("name");
   var age = request.param("age");
   var addr = request.param("addr");
@@ -26,12 +29,12 @@ app.get("/insertMember", function(request,respone){
   var doc = {name:name, age:age,addr:addr};
   console.log(doc);
   member.insertMember(doc);
-  respone.send(doc);
+  response.send(doc);
 })
 // insert 끝.
 
 
-app.get("/updateMember", function(request,respone){
+app.get("/updateMember", function(request,response){
   var name = request.param("name");
   var age = request.param("age");
   var addr = request.param("addr");
@@ -40,10 +43,10 @@ app.get("/updateMember", function(request,respone){
   var doc = {name:name, age:age,addr:addr};
   console.log(doc);
   member.updateMember(doc,_id);
-  respone.send(doc);
+  response.send(doc);
 })
 
-app.get("/deleteMember", function(request,respone){
+app.get("/deleteMember", function(request,response){
   var name = request.param("name");
   var age = request.param("age");
   var addr = request.param("addr");
@@ -52,28 +55,40 @@ app.get("/deleteMember", function(request,respone){
   var doc = {name:name, age:age,addr:addr};
   console.log(doc);
   member.deleteMember(doc,_id);
-  respone.send(doc);
+  response.send(doc);
 })
 
 /*
-app.get("/searchMember", function(request,respone){
+app.get("/searchMember", function(request,response){
   var keyword = request.param("keyword");
   console.log(doc);
   member.searchMember(keyword);
-  respone.send(doc);
+  response.send(doc);
 })*/
 
 
+//키워드 선택하면 검색되는 기능 (like연산자 포함 -ex.서울, 서울시 마포구, 서울특별시 서대문구)
 
+//member 서비스명을 갖고
+// 모든 회원출력
+// 검색을 사용하려고 합니다.
+// 검색어가 오면 검색을 하고
+// 검색어가 오지 않으면 모든 회원을 find해요.
 app.get("/member", function(request, response){
+
+  const MongoClient = require('mongodb').MongoClient;
+  const assert = require('assert');
+
   var keyword = request.param("keyword");
+  var cname = request.param("cname");
   console.log("검색어"+keyword);
   var doc = {}
   if(keyword != null && keyword != ""){
-    doc = {addr:keyword};
+    doc[cname] = new RegExp(keyword,"i");
+    // doc = {cname:keyword}
+    console.log(doc);
   }
-  const MongoClient = require('mongodb').MongoClient;
-  const assert = require('assert');
+
 
   // Connection URL
   const url = 'mongodb://localhost:27017';
@@ -101,7 +116,7 @@ app.get("/member", function(request, response){
   });
 });
 
-app.all("/data.html",function(request, respone){
+app.all("/data.html",function(request, response){
   var output = "";
   output += "<!DOCTYPE html>";
   output += "<html>";
@@ -117,11 +132,11 @@ app.all("/data.html",function(request, respone){
   output += "</body>";
   output += "</head>";
   output += "</html>";
-  respone.send(output);
+  response.send(output);
 });
 
-app.all("/data.json",function(request, respone){
-  respone.send(items);
+app.all("/data.json",function(request, response){
+  response.send(items);
 });
 
 app.get("/products/:id",function(request, response){
@@ -154,8 +169,8 @@ app.post("/products", function(request, response){
 });
 
 
-app.all("/data.xml",function(request, respone){
-    respone.type("text/xml");
+app.all("/data.xml",function(request, response){
+    response.type("text/xml");
     var output = "";
     output += '<?xml version="1.0" encoding="UTF-8"?>';
     output += "<products>";
@@ -167,7 +182,7 @@ app.all("/data.xml",function(request, respone){
     });
 
     output += "</products>";
-    respone.send(output);
+    response.send(output);
 });
 
 http.createServer(app).listen(52273, function(){
