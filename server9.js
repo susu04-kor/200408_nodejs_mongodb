@@ -18,7 +18,7 @@ app.use(express.static("public"));
 app.use(express.bodyParser());
 app.use(app.router);
 
-app.get("/insertMember", function(request,response){
+app.get("/insertMember", function(request,respone){
   var name = request.param("name");
   var age = request.param("age");
   var addr = request.param("addr");
@@ -26,12 +26,12 @@ app.get("/insertMember", function(request,response){
   var doc = {name:name, age:age,addr:addr};
   console.log(doc);
   member.insertMember(doc);
-  response.send(doc);
+  respone.send(doc);
 })
 // insert 끝.
 
 
-app.get("/updateMember", function(request,response){
+app.get("/updateMember", function(request,respone){
   var name = request.param("name");
   var age = request.param("age");
   var addr = request.param("addr");
@@ -40,10 +40,10 @@ app.get("/updateMember", function(request,response){
   var doc = {name:name, age:age,addr:addr};
   console.log(doc);
   member.updateMember(doc,_id);
-  response.send(doc);
+  respone.send(doc);
 })
 
-app.get("/deleteMember", function(request,response){
+app.get("/deleteMember", function(request,respone){
   var name = request.param("name");
   var age = request.param("age");
   var addr = request.param("addr");
@@ -52,41 +52,56 @@ app.get("/deleteMember", function(request,response){
   var doc = {name:name, age:age,addr:addr};
   console.log(doc);
   member.deleteMember(doc,_id);
-  response.send(doc);
+  respone.send(doc);
 })
+
+/*
+app.get("/searchMember", function(request,respone){
+  var keyword = request.param("keyword");
+  console.log(doc);
+  member.searchMember(keyword);
+  respone.send(doc);
+})*/
 
 
 
 app.get("/member", function(request, response){
-      const MongoClient = require('mongodb').MongoClient;
-    const assert = require('assert');
+  var keyword = request.param("keyword");
+  console.log("검색어"+keyword);
+  var doc = {}
+  if(keyword != null && keyword != ""){
+    doc = {addr:keyword};
+  }
+  const MongoClient = require('mongodb').MongoClient;
+  const assert = require('assert');
 
-    // Connection URL
-    const url = 'mongodb://localhost:27017';
+  // Connection URL
+  const url = 'mongodb://localhost:27017';
 
-    // Database Name
-    const dbName = 'bit';
+  // Database Name
+  const dbName = 'bit';
 
-    // Create a new MongoClient
-    const client = new MongoClient(url);
+  // Create a new MongoClient
+  const client = new MongoClient(url);
 
-    // Use connect method to connect to the Server
-    client.connect(function(err, client) {
-      assert.equal(null, err);
-      console.log("Connected correctly to server");
-      const db = client.db(dbName);
-      const col = db.collection('member');
-        // Get first two documents that match the query
-        col.find({}).toArray(function(err, docs) {
-        //  assert.equal(null, err);
-        //  assert.equal(2, docs.length);
-          client.close();
-          response.send(docs);
-        });
-    });
+  // Use connect method to connect to the Server
+  client.connect(function(err, client) {
+    assert.equal(null, err);
+    console.log("Connected correctly to server");
+    const db = client.db(dbName);
+    const col = db.collection('member');
+      // Get first two documents that match the query
+      col.find(doc).toArray(function(err, docs) {
+      //  assert.equal(null, err);
+      //  assert.equal(2, docs.length);
+        // re = docs;
+        client.close();
+       response.send(docs);
+      });
+  });
 });
 
-app.all("/data.html",function(request, response){
+app.all("/data.html",function(request, respone){
   var output = "";
   output += "<!DOCTYPE html>";
   output += "<html>";
@@ -102,11 +117,11 @@ app.all("/data.html",function(request, response){
   output += "</body>";
   output += "</head>";
   output += "</html>";
-  response.send(output);
+  respone.send(output);
 });
 
-app.all("/data.json",function(request, response){
-  response.send(items);
+app.all("/data.json",function(request, respone){
+  respone.send(items);
 });
 
 app.get("/products/:id",function(request, response){
@@ -139,8 +154,8 @@ app.post("/products", function(request, response){
 });
 
 
-app.all("/data.xml",function(request, response){
-    response.type("text/xml");
+app.all("/data.xml",function(request, respone){
+    respone.type("text/xml");
     var output = "";
     output += '<?xml version="1.0" encoding="UTF-8"?>';
     output += "<products>";
@@ -152,7 +167,7 @@ app.all("/data.xml",function(request, response){
     });
 
     output += "</products>";
-    response.send(output);
+    respone.send(output);
 });
 
 http.createServer(app).listen(52273, function(){
