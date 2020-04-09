@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <link rel="stylesheet" href="style.css">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script type="text/javascript">
+      $(function(){
+        var arr;
+        $.ajax("blogList",{success:function(data){
+            arr = data;
+            $.each(data, function(idx, item){
+              var h2 = $("<h2></h2>").html(item.title);
+              var p = $("<p></p>").html(item.content.substr(0,20) + "..."); //컨텐츠의 일부부만 보여주고 ...중략
+              var a = $("<a href='#'></a>").html("Read more").attr("idx", idx);
+              $(a).click(function(){
+                  var i = $(this).attr("idx");
+                  var _id = arr[i]._id;
+                  location.href = "blogDetail.html?_id="+_id;
+                  //location - 주소줄을 안내하는 객체(??????????)
+                  //하나의 문서에서 하려면 location.href = ".....html?_id="+id; 해도됨
+              })
+              $("#list").append(h2,p,a);
+            })
+        }})
+      })
+    </script>
+  </head>
+  <body>
+    <div id="contentarea">
+      <div id="innercontentarea">
+        <h1>My Blogs</h1>
+        <div id="list">
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

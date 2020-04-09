@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <link rel="stylesheet" href="style.css">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script type="text/javascript">
+        $(function(){
+            var arr;
+            $.ajax("blogList",{success:function(data){
+                arr = data;
+                $.each(arr, function(idx, item){
+                  var td1 = $("<td></td>").html(item.title);
+                  var td2 = $("<td></td>").html(item.saved_at);
+                  var a_view = $("<a></a>").html("View").attr("href", "blogDetail.html?_id="+item._id);
+                  var a_edit = $("<a></a>").html("Edit").attr("href", "blogEdit.html?_id="+item._id);;
+                  var a_delete = $("<a href='#'></a>").html("Delete").attr("_id",item._id);
+
+                  $(a_delete).click(function(){
+                      var re = confirm("정말로 삭제하시겠습니까?");
+                      if(re == true){
+                        var _id =$(this).attr("_id");
+                        $.ajax("blogDelete",{data:{_id:_id},success:function(r){
+                          if(r == "1"){
+                            location.href = "dashboard.html";
+                          }
+                        }});
+                      }
+                  });
+
+                  var td3 = $("<td></td>");
+                  var span1 = $("<span>&nbsp;&nbsp;</span>")
+                  var span2 = $("<span>&nbsp;&nbsp;</span>")
+                  $(td3).append(a_view,span1,a_edit,span2,a_delete);
+
+                  var tr = $("<tr></tr>");
+                  $(tr).append(td1,td2, td3);
+                  $("#tbody").append(tr);
+                });
+            }})
+        });
+    </script>
+  </head>
+  <body>
+      <div id="contentarea">
+        <div id="innercontentarea">
+            <h1>Dashboard</h1>
+            <table class="articles" cellpading="0" cellspacing="0">
+                <thead>
+                  <tr>
+                    <th width="55%">Title</th>
+                    <th width="27%">Created</th>
+                    <th width="*">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody">
+                </tbody>
+            </table>
+        </div>
+      </div>
+  </body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <link rel="stylesheet" href="style.css">
+      <script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+      <script type="text/javascript">
+      $(function(){
+        //location - 주소줄을 가져오는 객체
+        //search - 주소줄 물음표 뒤에 쿼리스트링!을 갖고오는 객체
+        //http://localhost:52273/blogDetail.html?_id=5e8e700286df3427b8d93112 중에 ?_id= 빼고 뒤에 스트링만 가져오기
+        var search = location.search; //?_id=5e8e700286df3427b8d93112
+
+        //=이 있는 자리를 찾고 =뒤에서부터 끝까지 잘라와야 함
+        //indexof() - 그 글자가 있는 index(자리)를 알려줌
+        //substr = 글자수를 줌
+        //subString = index를 줌
+
+          var _id = search.substring(search.indexOf("=")+1);      //=이 있는 곳 바로 다음 글자부터 끝까지 잘라와
+
+        //substring(5, 100) - 5번째 index에서 100번째까지 잘라와
+        //substring(5, 100) - 5번째에서 끝까지 잘라와
+
+        //alert(_id);
+        $.ajax("blogDetail", {data:{_id:_id},success:function(data){
+            //alert(data);
+            var h2 = $("<h2></h2>").html(data.title);
+            var p = $("<p></p>").html(data.content);
+            $("#innercontentarea").append(h2, p);
+        }})
+      })
+    </script>
+  </head>
+  <body>
+    <div id="contentarea">
+      <div id="innercontentarea">
+        <h1>My Blogs</h1>
+      </div>
+    </div>
+  </body>
+</html>
